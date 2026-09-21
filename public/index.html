@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="StayBook — a mini hotel booking system. Search coastal Andhra hotels, pick a room and book instantly.">
+<title>StayBook · Hotel Booking System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <button class="brand" data-nav="search" aria-label="StayBook home">
+      <svg class="brand-mark" viewBox="0 0 32 32" width="30" height="30" aria-hidden="true">
+        <circle cx="16" cy="11" r="5.5" fill="none" stroke="currentColor" stroke-width="2.4"/>
+        <g stroke="currentColor" stroke-width="2.4" stroke-linecap="round" fill="none">
+          <path d="M16 3V2.2M7.2 6.8l-.8-.8M24.8 6.8l.8-.8"/>
+          <path d="M5 22h22M7 22v7M25 22v7M10.5 29v-4.5h11V29"/>
+        </g>
+      </svg>
+      <span class="brand-text">StayBook<span class="brand-dot">.</span></span>
+    </button>
+
+    <nav class="main-nav" aria-label="Primary">
+      <button class="nav-btn active" data-nav="search">Explore hotels</button>
+      <button class="nav-btn" data-nav="history">My bookings</button>
+    </nav>
+  </div>
+</header>
+
+<main class="view-wrap">
+
+  <!-- SEARCH / HOTEL LIST VIEW -->
+  <section id="view-search" class="view active">
+    <section class="hero">
+      <div class="container">
+        <div class="hero-copy">
+          <h1 class="hero-title">Coastal stays, <em>booked in seconds.</em></h1>
+          <p class="hero-sub">Search hotels near the coast, compare rooms and confirm your stay — without ever leaving this page.</p>
+        </div>
+
+        <form class="search-band" id="heroSearch" role="search" aria-label="Search hotels">
+          <label class="field">
+            <svg class="field-icon" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/>
+            </svg>
+            <span class="field-label">Where to?</span>
+            <input type="text" id="sLocation" placeholder="Town or city" autocomplete="off">
+          </label>
+          <label class="field">
+            <span class="field-label">Check-in</span>
+            <input type="date" id="sCheckIn">
+          </label>
+          <label class="field">
+            <span class="field-label">Check-out</span>
+            <input type="date" id="sCheckOut">
+          </label>
+          <label class="field">
+            <span class="field-label">Guests</span>
+            <select id="sGuests">
+              <option value="1">1 guest</option>
+              <option value="2" selected>2 guests</option>
+              <option value="3">3 guests</option>
+              <option value="4">4 guests</option>
+              <option value="5">5 guests</option>
+              <option value="6">6 guests</option>
+            </select>
+          </label>
+          <button type="submit" class="btn btn-coral search-btn">Search stays</button>
+        </form>
+      </div>
+      <div class="hero-glow" aria-hidden="true"></div>
+    </section>
+
+    <div class="container">
+      <div class="results-toolbar">
+        <div class="filters" aria-label="Filter hotels">
+          <input type="text" id="filterLocation" placeholder="Location" autocomplete="off">
+          <input type="number" id="filterMinPrice" placeholder="Min ₹" min="0">
+          <input type="number" id="filterMaxPrice" placeholder="Max ₹" min="0">
+          <select id="filterRating" aria-label="Minimum rating">
+            <option value="">Any rating</option>
+            <option value="4">4.0 ★ &amp; up</option>
+            <option value="4.5">4.5 ★ &amp; up</option>
+          </select>
+          <button class="btn btn-primary" id="btnFilter">Apply</button>
+          <button class="btn btn-ghost" id="btnReset">Reset</button>
+        </div>
+        <div class="results-meta">
+          <span id="resultCount">0</span> <span id="resultLabel">stays</span>
+          <label class="sort-label" aria-label="Sort hotels">
+            <span>Sort</span>
+            <select id="sortBy">
+              <option value="recommended">Recommended</option>
+              <option value="price-asc">Price · low to high</option>
+              <option value="price-desc">Price · high to low</option>
+              <option value="rating-desc">Rating</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <div id="hotelList" class="card-grid hotel-grid" aria-live="polite"></div>
+
+      <div id="searchEmpty" class="empty-state hidden">
+        <svg class="empty-icon" viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5M8 11h6"/>
+        </svg>
+        <h3>No stays match your filters</h3>
+        <p>Try widening the price range or clearing the location.</p>
+        <button class="btn btn-coral" id="btnClearAll">Clear filters</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOTEL DETAIL + ROOMS VIEW -->
+  <section id="view-hotel" class="view">
+    <div class="container">
+      <button class="back-btn" data-back="search">← Back to search</button>
+      <div id="hotelDetail"></div>
+      <div class="section-head">
+        <h2 id="roomSectionTitle">Available rooms</h2>
+        <p id="roomSubtext">Pick a room type and book it in under a minute.</p>
+      </div>
+      <div id="roomList" class="card-grid room-grid" aria-live="polite"></div>
+      <div id="roomEmpty" class="empty-state hidden">
+        <svg class="empty-icon" viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="4" y="3" width="16" height="20" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/>
+        </svg>
+        <h3>All booked up</h3>
+        <p>No rooms are free right now. Check back later or pick another hotel.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- BOOKING FORM VIEW -->
+  <section id="view-booking" class="view">
+    <div class="container narrow">
+      <button class="back-btn" data-back="hotel">← Back to rooms</button>
+
+      <div class="booking-layout">
+        <aside class="order-panel">
+          <p class="eyebrow">Your stay</p>
+          <h2 id="bookingHotelName">—</h2>
+          <p class="order-location" id="bookingHotelPlace">—</p>
+
+          <div class="room-gallery" id="roomGallery">
+            <div class="gallery-main">
+              <img id="galleryMain" src="" alt="Room preview">
+            </div>
+            <div class="gallery-thumbs" id="galleryThumbs"></div>
+            <div class="gallery-tags" id="galleryTags"></div>
+          </div>
+
+          <div class="order-room">
+            <span class="room-type-badge" id="bookingRoomType">—</span>
+            <span class="order-room-info">Room <b id="bookingRoomNo">—</b> · ₹<span id="bookingRate">0</span>/night</span>
+          </div>
+
+          <div class="order-lines">
+            <div class="order-line"><span>Check-in</span><b id="orderCheckIn">—</b></div>
+            <div class="order-line"><span>Check-out</span><b id="orderCheckOut">—</b></div>
+            <div class="order-line"><span>Nights</span><b id="orderNights">—</b></div>
+            <div class="order-line"><span>Guests</span><b id="orderGuests">—</b></div>
+          </div>
+
+          <div class="order-total">
+            <span>Total</span>
+            <b id="orderTotal">—</b>
+          </div>
+        </aside>
+
+        <div class="form-panel">
+          <h2>Who's staying?</h2>
+          <p class="panel-sub">We hold the room the moment you confirm.</p>
+
+          <form id="bookingForm" novalidate>
+            <label for="userId">Your name / User ID</label>
+            <input type="text" id="userId" required autocomplete="name" placeholder="e.g. sanju01">
+
+            <div class="form-row">
+              <div class="form-field">
+                <label for="checkIn">Check-in</label>
+                <input type="date" id="checkIn" required>
+              </div>
+              <div class="form-field">
+                <label for="checkOut">Check-out</label>
+                <input type="date" id="checkOut" required>
+              </div>
+            </div>
+            <p class="field-hint" id="dateHint">Pick dates to preview your total.</p>
+
+            <label for="guests">Guests</label>
+            <select id="guests">
+              <option value="1">1 guest</option>
+              <option value="2" selected>2 guests</option>
+              <option value="3">3 guests</option>
+              <option value="4">4 guests</option>
+              <option value="5">5 guests</option>
+              <option value="6">6 guests</option>
+            </select>
+
+            <button type="submit" class="btn btn-coral btn-block" id="btnConfirm">Confirm booking</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONFIRMATION / STAY VOUCHER VIEW -->
+  <section id="view-confirm" class="view">
+    <div class="container narrow">
+      <div class="confirm-hero">
+        <div class="check-badge">✓</div>
+        <h2>Booking confirmed!</h2>
+        <p>Your room is locked in. Show this voucher at check-in.</p>
+        <div class="confirm-actions">
+          <button class="btn btn-primary" data-nav="history" id="btnGoHistory">View my bookings</button>
+          <button class="btn btn-ghost" data-nav="search">Back to hotels</button>
+        </div>
+      </div>
+      <div id="voucherCard"></div>
+    </div>
+  </section>
+
+  <!-- BOOKING HISTORY VIEW -->
+  <section id="view-history" class="view">
+    <div class="container">
+      <div class="section-head">
+        <h2>My bookings</h2>
+        <p class="panel-sub">Every stay you've confirmed, in one place.</p>
+      </div>
+
+      <div class="user-bar">
+        <input type="text" id="historyUserId" placeholder="Type your User ID to load your trips" autocomplete="off">
+        <button class="btn btn-primary" id="btnLoadHistory">Load trips</button>
+      </div>
+
+      <div id="statsStrip" class="stats hidden"></div>
+      <div id="historyList" class="history-list" aria-live="polite"></div>
+
+      <div id="historyEmpty" class="empty-state hidden">
+        <svg class="empty-icon" viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M3 7h18M5 7v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V7"/><path d="M5 3h14v4H5zM9 11h6M9 15h6"/>
+        </svg>
+        <h3>No stays yet</h3>
+        <p>Search for a coast-side hotel and make your first booking.</p>
+        <button class="btn btn-coral" data-nav="search">Explore hotels</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <p class="footer-note">Hotel Booking System · Mini Project — Node.js + Express backend, vanilla HTML/CSS/JS frontend. Hotel, Room &amp; Booking connected by reference IDs.</p>
+    <a class="footer-link" href="http://localhost:3001" target="_blank" rel="noopener">Admin console &rarr; port 3001</a>
+  </div>
+</footer>
+
+<!-- Cancel confirmation modal -->
+<div id="modalRoot" class="modal-root hidden">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <h3 id="modalTitle">Cancel this booking?</h3>
+    <p id="modalText">The room will be freed up for other guests.</p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="modalKeep">Keep booking</button>
+      <button class="btn btn-danger" id="modalConfirmCancel">Cancel booking</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast notifications -->
+<div id="toastStack" class="toast-stack" aria-live="assertive"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
